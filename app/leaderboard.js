@@ -1,6 +1,7 @@
 PlayersList = new Mongo.Collection('players');
 
 if(Meteor.isClient){
+  Meteor.subscribe('thePlayers');
   // this code only runs on the client
   Template.leaderboard.helpers({
     'player': function(){
@@ -61,6 +62,9 @@ if(Meteor.isClient){
 
 if(Meteor.isServer){
   // this code only runs on the server
-
+  Meteor.publish('thePlayers', function(){
+    var currentUserId = this.userId;
+    return PlayersList.find({ createdBy: currentUserId });
+  });
 }
 
