@@ -4,7 +4,7 @@ if(Meteor.isClient){
   // this code only runs on the client
   Template.leaderboard.helpers({
     'player': function(){
-      return PlayersList.find();
+      return PlayersList.find({}, { sort: {score: -1, name: 1} });
     },
     'otherHelperFunction': function(){
       return "Some other function";
@@ -15,6 +15,10 @@ if(Meteor.isClient){
       if(playerId == selectedPlayer){
         return "selected"
       }
+    },
+    'selectedPlayer': function(){
+      var selectedPlayer = Session.get('selectedPlayer');
+      return PlayersList.findOne({ _id: selectedPlayer });
     }
   });
   Template.leaderboard.events({
@@ -23,6 +27,14 @@ if(Meteor.isClient){
       Session.set('selectedPlayer', playerId);
       let selectedPlayer = Session.get('selectedPlayer');
       console.log(selectedPlayer);
+    },
+    'click .increment': function(){
+      var selectedPlayer = Session.get('selectedPlayer');
+      PlayersList.update({ _id: selectedPlayer }, { $inc: {score: 5 }});
+    },
+    'click .decrement': function(){
+      var selectedPlayer = Session.get('selectedPlayer');
+      PlayersList.update({ _id: selectedPlayer }, {$inc: {score: -5} });
     }
   });
 }
