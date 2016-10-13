@@ -3,10 +3,16 @@
 </head>
 <body>
 <h1>Leaderboard</h1>
+<p>
+  {{> loginButtons}}
+</p>
 {{> leaderboard}}
+
 </body>
 
 <template name="leaderboard">
+
+  {{#if currentUser}}
   {{> addPlayerForm}}
   <ul>
     {{#each player}}
@@ -15,12 +21,15 @@
     {{#if selectedPlayer}}
     <li>Selected Player: {{selectedPlayer.name}}</li>
     <li>
-    <button class="increment">Give 5 Points</button>
-    <button class="decrement">Take 5 Points</button>
-    <button class="remove">Remove Player</button>
+      <button class="increment">Give 5 Points</button>
+      <button class="decrement">Take 5 Points</button>
+      <button class="remove">Remove Player</button>
     </li>
     {{/if}}
   </ul>
+  {{else}}
+  <p>You must be logged-in to see this content.</p>
+  {{/if}}
 
 </template>
 
