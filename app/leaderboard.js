@@ -33,15 +33,15 @@ if(Meteor.isClient){
     },
     'click .increment': function(){
       var selectedPlayer = Session.get('selectedPlayer');
-      PlayersList.update({ _id: selectedPlayer }, { $inc: {score: 5 }});
+      Meteor.call('updateScore', selectedPlayer, 5);
     },
     'click .decrement': function(){
       var selectedPlayer = Session.get('selectedPlayer');
-      PlayersList.update({ _id: selectedPlayer }, {$inc: {score: -5} });
+      Meteor.call('updateScore', selectedPlayer, -5);
     },
     'click .remove': function(){
       var selectedPlayer = Session.get('selectedPlayer');
-      PlayersList.remove({ _id: selectedPlayer });
+      Meteor.call('removePlayer', selectedPlayer);
     }
   });
   Template.addPlayerForm.events({
@@ -49,12 +49,7 @@ if(Meteor.isClient){
     'submit form': function(event){
       event.preventDefault();
       var playerNameVar = event.target.playerName.value;
-      var currentUserId = Meteor.userId();
-      PlayersList.insert({
-        name: playerNameVar,
-        score: 0,
-        createdBy: currentUserId
-      });
+      Meteor.call('createPlayer', playerNameVar);
       event.target.playerName.value = "";
     }
   });
@@ -67,4 +62,34 @@ if(Meteor.isServer){
     return PlayersList.find({ createdBy: currentUserId });
   });
 }
+
+Meteor.methods({
+  'createPlayer': function(playerNameVar){
+    check(playerNameVar, String);
+    var currentUserId = Meteor.userId();
+    if(currentUserId){
+      PlayersList.insert({
+        name: playerNameVar,
+        score: 0,
+        createdBy: currentUserId
+      });
+    }
+  },
+  'removePlayer': function(selectedPlayer){
+    check(selectedPlayer, String);
+    var currentUserId = Meteor.userId();
+    if(currentUserId){
+      PlayersList.remove({ _id: selectedPlayer, createdBy: currentUserId });
+    }
+  },
+  'updateScore': function(selectedPlayer, scoreValue){
+    check(selectedPlayer, String);
+    check(scoreValue, Number);
+    var currentUserId = Meteor.userId();
+    if(currentUserId){
+      PlayersList.update( { _id: selectedPlayer, createdBy: currentUserId },
+          { $inc: {score: scoreValue} });
+    }
+  }
+});
 
